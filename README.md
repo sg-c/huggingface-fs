@@ -38,7 +38,6 @@ hffs stop [--destroy-cache]
 ## Peer 管理
 
 > [!NOTE]
-
 > 关于自动 Peer 管理：为了提高易用性，HFFS 计划加入自动 Peer 管理功能（HFFS 自动发现、连接 Peer）。在该功能发布以前，用户可以通过下面的命令手动管理 Peer。
 
 ### 添加 Peer
