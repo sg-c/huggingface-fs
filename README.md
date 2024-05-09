@@ -15,34 +15,43 @@ HFFS 的典型使用场景有：
 ## HFFS 的命令行
 
 ### HFFS 服务管理
+
+#### 启动 HFFS
 ```bash
 hffs start
 ```
 用户通过上面的命令开启本地 HFFS 服务。如果还未初始化，该命令则初始化 HFFS。
+
+#### 关闭 HFFS
 ```bash
 hffs stop [--destroy-cache]
 ```
 用户通过上面的命令关闭本地 HFFS 服务。如果指定 --destory-cache 选项，则删除本地 MadFS 相关资源。
 
 ### Peer 管理
+> [!NOTE] 关于自动 Peer 管理
+> 为了提高易用性，HFFS 计划加入自动 Peer 管理功能（HFFS 自动发现、连接 Peer）。在该功能发布以前，用户可以通过下面的命令手动管理 Peer。
+
+#### 添加 Peer
 ```bash
 hffs peer add [HOST|IP|FILE]
 ```
 用户通过上面的命令把 peer 节点配对。配对后，两个节点之间的模型实现互通共享。
 - `HOST|IP` 参数是目标节点的host或者ip地址，如果有多个值，用逗号隔开
 - `FILE` 参数是配置文件路径，peer 的 host 或者 ip 可以保存在文件中管理
-
+#### 查看 Peer
 ```bash
 hffs peer ls
 ```
 用户通过上面的命令查看 peer 信息。
-
+#### 删除 Peer
 ```bash
 hffs peer rm [HOST|IP|FILE]
 ```
 用户通过上面的命令删除 peer 节点。
 
 ### 模型管理
+#### 查看模型
 ```bash
 hffs model ls [repo-id]
 ```
@@ -54,14 +63,14 @@ hffs model ls [repo-id]
 - num of files：模型所包括的文件个数
 - local path：模型在本地文件系统中的路径
 - whether fully downoaded：模型是否已经被完整下载
-
+#### 添加模型
 ```bash
 hffs model add repo-id [--branch BRANCH] [--revision REVISION]
 ```
 下载指定的模型。
 - 如果模型已经缓存，返回 `hffs model ls repo-id` 命令的返回信息。
 - 如果模型还未缓存，从 peer 节点或者 hf.co 下载目标模型，显示下载进度条，结束后返回 `hffs model ls repo-id` 命令的返回信息。
-
+#### 删除模型
 ```bash
 hffs model rm repo-id [--branch BRANCH] [--revision REVISION]
 ```
