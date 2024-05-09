@@ -1,5 +1,3 @@
-# HuggingFace FS (HFFS)
-
 ## 什么是 HuggingFace FS (简称 "HFFS") ？
 
 HuggingFace FS (简称 "HFFS") 目标成为一款“小而美”的工具，帮助中国大陆用户在使用 [HuggingFace](huggingface.co) 的时候，能够方便地下载、管理、分享来自 HF 的模型。
