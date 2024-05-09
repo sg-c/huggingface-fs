@@ -1,16 +1,5 @@
-# huggingface-fs
+# HuggingFace FS (HFFS)
 
-## Install Prerequisits
+## 什么是 HuggingFace FS (简称 "HFFS")
 
-Install node.js v20.
-```bash
-# install node version manager
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-# execute ~/.zshrc
-source ~/.zshrc
-# list nodejs version
-nvm install v20.13.0
-# install yarn
-npm install --global yarn
-```
-
+HuggingFace FS (简称 "HFFS") 是一款“小而美”的工具，它的目标是帮助用户更加方便地下载、分享、管理来自 [HuggingFace](huggingface.co) 上的模型。
