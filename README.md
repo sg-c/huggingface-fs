@@ -29,8 +29,8 @@ hffs stop [--destroy-cache]
 用户通过上面的命令关闭本地 HFFS 服务。如果指定 --destory-cache 选项，则删除本地 MadFS 相关资源。
 
 ### Peer 管理
-> [!NOTE] 关于自动 Peer 管理
-> 为了提高易用性，HFFS 计划加入自动 Peer 管理功能（HFFS 自动发现、连接 Peer）。在该功能发布以前，用户可以通过下面的命令手动管理 Peer。
+> [!NOTE] 
+> 关于自动 Peer 管理：为了提高易用性，HFFS 计划加入自动 Peer 管理功能（HFFS 自动发现、连接 Peer）。在该功能发布以前，用户可以通过下面的命令手动管理 Peer。
 
 #### 添加 Peer
 ```bash
