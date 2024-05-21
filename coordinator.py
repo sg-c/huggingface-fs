@@ -1,11 +1,10 @@
 import aiohttp
 import asyncio
-from peer import PeerManager, PeerStore
+from peer import PeerManager
 
 
 class PeerFinder:
-    def __init__(self, peer_store: PeerStore, peer_manager: PeerManager):
-        self.__peer_store = peer_store
+    def __init__(self, peer_manager: PeerManager):
         self.__peer_manager = peer_manager
 
     async def _peer_has_file(self, peer, repo_id, branch, revision):

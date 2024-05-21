@@ -1,8 +1,10 @@
 import argparse
 import sys
+import asyncio
 
 from model import ModelManager
 from peer import PeerManager, PeerStore
+from http_server import start_server
 
 
 peer_store = PeerStore()
@@ -27,22 +29,34 @@ def peer_cmd(args):
         raise ValueError("Invalid subcommand")
 
 
-def model_cmd(arg):
-    if args.model_command == "add":
-        model_manager.add_model(args.repo_id, args.branch, args.revision)
-
-
-def exec_cmd(args):
-    if args.command == "peer":
-        peer_cmd(args)
-    elif args.command == "model":
-        model_cmd(args)
-    elif args.command == "start":
-        pass
-    elif args.command == "stop":
-        pass
+async def model_cmd(args):
+    if args.model_command == "search":
+        await model_manager.search_model(args.repo_id, args.revision, args.file)
+    elif args.model_command == "add":
+        model_manager.add_model(args.repo_id, args.revision, args.file)
     else:
         raise ValueError("Invalid subcommand")
+
+
+async def service_cmd():
+    await asyncio.create_task(start_server(peer_manager))
+    await asyncio.create_task(peer_manager.start_probe())
+
+
+async def exec_cmd(args, parser):
+    try:
+        if args.command == "peer":
+            peer_cmd(args)
+        elif args.command == "model":
+            await model_cmd(args)
+        elif args.command == "start":
+            await service_cmd()
+        elif args.command == "stop":
+            pass
+        else:
+            raise ValueError("Invalid command")
+    except ValueError:
+        parser.print_usage()
 
 
 def arg_parser():
@@ -50,7 +64,7 @@ def arg_parser():
     subparsers = parser.add_subparsers(dest='command')
 
     # hffs start
-    start_parser = subparsers.add_parser('start')
+    _ = subparsers.add_parser('start')
 
     # hffs stop [--destroy-cache]
     stop_parser = subparsers.add_parser('stop')
@@ -67,26 +81,33 @@ def arg_parser():
     peer_rm_parser.add_argument('--port', type=int)
     peer_ls_parser = peer_subparsers.add_parser('ls')
 
-    # hffs model {ls,add,rm} [--repo-id id] [--branch BRANCH] [--revision REVISION]
+    # hffs model {ls,add,rm,search} [--repo-id id] [--revision REVISION] [--file FILE]
     model_parser = subparsers.add_parser('model')
     model_subparsers = model_parser.add_subparsers(dest='model_command')
     model_ls_parser = model_subparsers.add_parser('ls')
     model_ls_parser.add_argument('--repo_id')
     model_add_parser = model_subparsers.add_parser('add')
     model_add_parser.add_argument('repo_id')
-    model_add_parser.add_argument('--branch')
     model_add_parser.add_argument('--revision')
+    model_add_parser.add_argument('--file')
     model_rm_parser = model_subparsers.add_parser('rm')
     model_rm_parser.add_argument('repo_id')
-    model_rm_parser.add_argument('--branch')
     model_rm_parser.add_argument('--revision')
+    model_rm_parser.add_argument('--file')
+    model_search_parser = model_subparsers.add_parser('search')
+    model_search_parser.add_argument('repo_id')
+    model_search_parser.add_argument('--revision')
+    model_search_parser.add_argument('--file')
 
-    return parser.parse_args()
+    return parser.parse_args(), parser
 
 
-if __name__ == "__main__":
-    args = arg_parser()
+async def main():
+    args, parser = arg_parser()
     try:
-        exec_cmd(args)
+        await exec_cmd(args, parser)
     finally:
         peer_store.close()
+
+if __name__ == "__main__":
+    asyncio.run(main())
