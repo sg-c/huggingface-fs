@@ -44,41 +44,48 @@ async def alive_peers():
 
 
 async def timeout_coro(coro, timeout, default):
-    async def _():
-        try:
-            return await asyncio.wait_for(coro, timeout)
-        except TimeoutError:
-            return default
-    return _()
+    try:
+        return await asyncio.wait_for(coro, timeout)
+    except TimeoutError:
+        return default
 
 
 async def search_coro(peer, repo_id, revision, file_name):
+    """Check if a certain file exists in a peer's model repository
+
+    Returns:
+        Peer or None: if the peer has the target file, return the peer, otherwise None
+    """
     try:
         async with aiohttp.ClientSession() as session:
             async with session.head(f"http://{peer.ip}:{peer.port}/model/{repo_id}/resolve/{revision}/{file_name}") as response:
                 if response.status == 200:
-                    return True
+                    return peer
     except Exception:
-        return False
+        return None
 
 
 async def search_model(peers, repo_id, revision, file_name):
     if not peers:
         return []
 
-    def gen_coro(peer):
+    async def gen_coro(peer):
         # for each peer, create a search corotine, and wrap it into
         # timeout corotine, so that they can finish withing 10 sec
         search = search_coro(peer, repo_id, revision, file_name)
-        timeout = timeout_coro(search, 10, False)
+        return await timeout_coro(search, 10, None)
 
-    coros = [gen_coro(p) for p in peers]
-    parallel = asyncio.gather(coros, True)
-    task = asyncio.create_task(parallel)
+    def finish(tasks):
+        return all([task.done() for task in tasks])
 
-    while not task.done():
-        await asyncio.sleep(1)
-        print(".", end="")
+    tasks = []
 
-    results = await task
-    return [r for r in results if not isinstance(r, Exception)]
+    async with asyncio.TaskGroup() as g:
+        for peer in peers:
+            tasks.append(g.create_task(gen_coro(peer)))
+
+        while not finish(tasks):
+            await asyncio.sleep(1)
+            print(".", end="")
+
+    return [task.result() for task in tasks if task.result() is not None]

@@ -1,3 +1,4 @@
+import asyncio
 from contextvars import ContextVar
 import os
 
@@ -52,6 +53,11 @@ async def alive_peers(request):
     return web.json_response([peer.to_dict() for peer in peers])
 
 
+async def search_model(request):
+    await asyncio.sleep(5)
+    return web.Response(status=404)
+
+
 async def start_server(peer_manager):
     ctx_var_peer_manager.set(peer_manager)
 
@@ -60,6 +66,9 @@ async def start_server(peer_manager):
     app.router.add_get('/file/{file_name}', download_file)
     app.router.add_get('/ping', pong)
     app.router.add_get('/alive_peers', alive_peers)
+
+    app.router.add_head(
+        '/model/{repo_id}/resolve/{revision}/{file_name}', search_model)
 
     runner = web.AppRunner(app)
     await runner.setup()
