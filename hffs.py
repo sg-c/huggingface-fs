@@ -2,8 +2,10 @@ import argparse
 import sys
 import asyncio
 
+from peer import Peer
+from peer_manager import PeerStore
 from model import ModelManager
-from peer import PeerManager, PeerStore
+from peer_manager import PeerManager
 from http_server import start_server
 
 
@@ -31,7 +33,12 @@ def peer_cmd(args):
 
 async def model_cmd(args):
     if args.model_command == "search":
-        await model_manager.search_model(args.repo_id, args.revision, args.file)
+        actives, avails = await model_manager.search_model(args.repo_id, args.revision, args.file)
+        print(f"Checked following peers:")
+        print(f"{Peer.print_peers(actives)}")
+        print(f"Peers who have the model:")
+        print(f"{Peer.print_peers(avails)}")
+
     elif args.model_command == "add":
         model_manager.add_model(args.repo_id, args.revision, args.file)
     else:

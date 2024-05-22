@@ -4,7 +4,7 @@ import os
 from aiohttp import web
 from aiohttp import streamer
 
-Context = ContextVar("ServerContext")
+ctx_var_peer_manager = ContextVar("PeerManager")
 
 
 @streamer
@@ -47,18 +47,19 @@ async def pong(request):
 
 
 async def alive_peers(request):
-    peer_manager = Context.get("peer_manager")
+    peer_manager = ctx_var_peer_manager.get()
     peers = peer_manager.get_actives()
-    return web.json_response(peers)
+    return web.json_response([peer.to_dict() for peer in peers])
 
 
 async def start_server(peer_manager):
-    Context.set("peer_manager", peer_manager)
+    ctx_var_peer_manager.set(peer_manager)
 
     app = web.Application()
 
     app.router.add_get('/file/{file_name}', download_file)
     app.router.add_get('/ping', pong)
+    app.router.add_get('/alive_peers', alive_peers)
 
     runner = web.AppRunner(app)
     await runner.setup()

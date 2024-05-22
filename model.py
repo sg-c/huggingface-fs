@@ -1,6 +1,6 @@
 import os
 from huggingface_hub import snapshot_download
-from http_client import alive_peers
+from http_client import alive_peers, search_model
 
 
 class ModelManager:
@@ -18,6 +18,9 @@ class ModelManager:
         snapshot_download(repo_id=repo_id, local_dir=dir,
                           allow_patterns=["*.txt", "*.json"])
 
-    async def search_model(self, repo_id, revision=None, file=None):
-        peers = await alive_peers()
-        print(peers)
+    async def search_model(self, repo_id, revision=None, file_name=None):
+        active_peers = await alive_peers()
+        avail_peers = []
+        if len(active_peers) > 0:
+            avail_peers = await search_model(active_peers, repo_id, revision, file_name)
+        return (active_peers, avail_peers)

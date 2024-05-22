@@ -1,6 +1,6 @@
 import aiohttp
 import asyncio
-from peer import PeerManager
+from peer_manager import PeerManager
 
 
 class PeerFinder:
