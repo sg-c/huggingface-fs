@@ -54,8 +54,13 @@ async def alive_peers(request):
 
 
 async def search_model(request):
-    await asyncio.sleep(5)
-    return web.Response(status=404)
+    # extract the repo_id, revision, and file_name from the request
+    repo_id = request.match_info['repo_id'] #vendor/model_name
+    revision = request.match_info['revision']
+    file_name = request.match_info['file_name']
+    print(f"Searching for {file_name} in {repo_id}:{revision}")
+    await asyncio.sleep(2)
+    return web.Response(status=200)
 
 
 async def start_server(peer_manager):

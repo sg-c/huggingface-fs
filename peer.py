@@ -48,4 +48,5 @@ class Peer:
 
     @classmethod
     def print_peers(cls, peers):
-        return [f"\t{p}\n" for p in peers]
+        from pprint import pprint
+        pprint([str(peer) for peer in peers])

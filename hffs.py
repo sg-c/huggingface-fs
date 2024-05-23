@@ -33,12 +33,7 @@ def peer_cmd(args):
 
 async def model_cmd(args):
     if args.model_command == "search":
-        actives, avails = await model_manager.search_model(args.repo_id, args.revision, args.file)
-        print(f"Checked following peers:")
-        print(f"{Peer.print_peers(actives)}")
-        print(f"Peers who have the model:")
-        print(f"{Peer.print_peers(avails)}")
-
+        await model_manager.search_model(args.repo_id, args.revision, args.file)
     elif args.model_command == "add":
         model_manager.add_model(args.repo_id, args.revision, args.file)
     else:

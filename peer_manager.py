@@ -86,6 +86,8 @@ class PeerManager:
                 heapq.heappush(self._probe_heap, (peer.get_epoch(), peer))
                 if peer.is_alive() and peer not in self._actives:
                     self._actives.add(peer)
+                elif not peer.is_alive and peer in self._actives:
+                    self._actives.remove(peer)
 
         while True:
             await asyncio.sleep(3)

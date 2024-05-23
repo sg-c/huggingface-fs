@@ -13,7 +13,7 @@ async def ping(peer):
     alive = False
     seq = os.urandom(4).hex()
 
-    print("[CLIENT]: probing", peer.ip, peer.port, seq)
+    # print("[CLIENT]: probing", peer.ip, peer.port, seq)
 
     try:
         async with aiohttp.ClientSession() as session:
@@ -24,8 +24,8 @@ async def ping(peer):
         peer.set_alive(alive)
         peer.set_epoch(int(time.time()))
 
-        print(
-            f"[CLIENT]: Peer {peer.ip}:{peer.port} (seq:{seq}) is {'alive' if alive else 'dead'}")
+        # print(
+        #     f"[CLIENT]: Peer {peer.ip}:{peer.port} (seq:{seq}) is {'alive' if alive else 'dead'}")
         return peer
 
 
@@ -81,11 +81,19 @@ async def search_model(peers, repo_id, revision, file_name):
     tasks = []
 
     async with asyncio.TaskGroup() as g:
+        print(f"Checked following peers:")
+        Peer.print_peers(peers)
+
         for peer in peers:
             tasks.append(g.create_task(gen_coro(peer)))
 
         while not finish(tasks):
             await asyncio.sleep(1)
-            print(".", end="")
+            print(".", end="", flush=True)
 
-    return [task.result() for task in tasks if task.result() is not None]
+        avails = [task.result() for task in tasks if task.result() is not None]
+
+        print("\nPeers who have the model:")
+        Peer.print_peers(avails)
+
+        return avails
